@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}
+Login
+{% endblock %}
+{% block content %}
+<form action="" method="post" novalidate>
+    <p><span class="message">Sign Up</span></p>
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.username.label }}
+        {{ form.username(size=20) }}
+        {% for error in form.username.errors %}
+            <span style="color: red;"> [{{ error }}]</span>
+            {% endfor %}  
+    </p>
+    <p>
+        {{ form.password.label }}
+        {{ form.password(size=20) }}
+        {% for error in form.password.errors %}
+            <span style="color: red;"> [{{ error }}]</span>
+            {% endfor %}
+    </p>
+    <p> {{ form.remember_me() }} {{ form.remember_me.label }} </p>
+    <p> {{form.submit() }} <a href="{{ url_for('login') }}">Sign In</a> </p>
+</form>
+{% endblock %}

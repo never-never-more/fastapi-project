@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}
+Login
+{% endblock %}
+{% block content %}
+<form action="/login" method="post" novalidate>
+    <p><span class="message">Sign In</span></p>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <p>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required minlength="3">
+        {% if errors and 'username' in errors %}
+            <span style="color: red;"> [{{ errors['username'] }}]</span>
+        {% endif %}
+    </p>
+
+    <p>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required minlength="3">
+        {% if errors and 'password' in errors %}
+            <span style="color: red;"> [{{ errors['password'] }}]</span>
+        {% endif %}
+    </p>
+
+    <p>
+        <button type="submit">Sign In</button>
+        <a href="/get_registr">Sign Up</a>
+    </p>
+</form>
+{% endblock %}
