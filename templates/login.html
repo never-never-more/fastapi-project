@@ -3,28 +3,21 @@
 Login
 {% endblock %}
 {% block content %}
-<form action="/login" method="post" novalidate>
+<form method="post">
     <p><span class="message">Sign In</span></p>
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <p>
+    
+    <div class="form-group">
         <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required minlength="3">
-        {% if errors and 'username' in errors %}
-            <span style="color: red;"> [{{ errors['username'] }}]</span>
-        {% endif %}
-    </p>
+        <input type="text" class="form-control" id="username" name="username" required>
+    </div>
 
-    <p>
+    <div class="form-group">
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required minlength="3">
-        {% if errors and 'password' in errors %}
-            <span style="color: red;"> [{{ errors['password'] }}]</span>
-        {% endif %}
-    </p>
+        <input type="password" class="form-control" id="password" name="password" required>
+    </div>
 
-    <p>
-        <button type="submit">Sign In</button>
-        <a href="/get_registr">Sign Up</a>
-    </p>
+    <button type="submit" class="btn-primary">Sign In</button>
+    <a href="/registr" class="btn-link">Sign In</a>
+    
 </form>
 {% endblock %}

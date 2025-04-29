@@ -1,13 +1,13 @@
 {% extends "layout.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Account settings{% endblock %}
 {% block content %}
 
-    <span class="message">Home page</span>
+    <span class="message">Account settings</span>
     {%if username %}
             <p>Hello there, {{ username }}!</p> 
             It's {{ date.strftime("%A, %d %B, %Y at %X") }}.
     {% else %}
             <p>Hello, Anonymous, Sign In to see more interesting content</p>
     {% endif %}
-
+    <a href="/logout" class="btn-link">Log Out</a>
 {% endblock %}

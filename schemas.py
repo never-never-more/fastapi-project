@@ -1,13 +1,20 @@
-from pydantic import BaseModel, EmailStr, validator
+from pydantic import BaseModel, EmailStr, field_validator
 
 class LoginForm(BaseModel):
     username: str
     password: str
-    remember_me: bool = False
 
-    @validator("username")
-    def username_length(cls, v):
+    @field_validator("username")
+    def username_length(cls, v):                            #   cls — это ссылка на сам класс (в данном случае на класс LoginForm).
+                                                            #   Он аналогичен self, но работает на уровне класса, а не экземпляра.
         if len(v) < 3:
             raise ValueError("Username length too short")
         return v
     
+    @field_validator("password")
+    def password_length(cls, v):
+        if len(v) < 3:
+            raise ValueError("Password length too short")
+        return v
+    
+

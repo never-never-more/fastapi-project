@@ -12,7 +12,11 @@
             <a href="{{ url_for('get_home') }}" class="navbar-brand">Home</a>
             <a href="{{ url_for('get_about') }}" class="navbar-item">About</a>
             <a href="{{ url_for('get_contact') }}" class="navbar-item">Contact</a>
-            <a href="{{ url_for('get_login') }}" class="navbar-login">Sign In</a>
+            {%  if request.cookies.get("username")  %}
+            <a href="{{ url_for('get_account')}}" class="navbar-login">{{ username }}</a>
+            {% else %}
+            <a href="{{ url_for('post_login') }}" class="navbar-login">Sign In</a>
+            {% endif %}
         </div>
         <hr/>
 
