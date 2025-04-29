@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path, Query, Body, Request, Form, status
+from fastapi import FastAPI, Path, Query, Body, Request, Form, status, Depends
 from fastapi.responses import  HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -51,8 +51,8 @@ async def post_login(   requset: Request,
     response.set_cookie(key="username", value=username)
     return response 
 
-@app.get("/logout")
-async def get_logout():
+@app.post("/logout")
+async def logout(request: Request):
     response = RedirectResponse("/")
     response.delete_cookie("username")
     return response
@@ -66,3 +66,4 @@ async def get_account(request: Request):
     username = request.cookies.get("username")
     return templates.TemplateResponse("account.html",
       {"request":request, "username": username, "date":datetime.now()})
+

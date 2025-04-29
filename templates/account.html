@@ -9,5 +9,7 @@
     {% else %}
             <p>Hello, Anonymous, Sign In to see more interesting content</p>
     {% endif %}
-    <a href="/logout" class="btn-link">Log Out</a>
+    <form action="/logout" method="post">
+        <button type="submit" class="btn-primary">Log Out</button>    
+    </form>
 {% endblock %}
