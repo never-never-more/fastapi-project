@@ -18,3 +18,17 @@ class LoginForm(BaseModel):
         return v
     
 
+class UserCreate(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+
+    class Config:
+        #   объектно-реляционное отображение
+        orm_mode = True
+
