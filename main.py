@@ -40,7 +40,7 @@ async def get_login(request: Request):
     return templates.TemplateResponse(request=request, name="login.html")
 
 @app.post("/login")                                                         #   Создана интерактивная логин форма 
-async def post_login(   requset: Request,
+async def post_login(   request: Request,
                         username: str = Form(...),
                         password: str = Form(...)   ):
     
@@ -50,12 +50,6 @@ async def post_login(   requset: Request,
     response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
     response.set_cookie(key="username", value=username)
     return response 
-
-@app.post("/logout")
-async def logout(request: Request):
-    response = RedirectResponse("/")
-    response.delete_cookie("username")
-    return response
 
 @app.get("/registr", response_class=HTMLResponse)
 async def get_registr(request: Request):
@@ -67,3 +61,8 @@ async def get_account(request: Request):
     return templates.TemplateResponse("account.html",
       {"request":request, "username": username, "date":datetime.now()})
 
+@app.post("/logout")
+async def logout(request: Request):
+    response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+    response.delete_cookie("username")
+    return response
