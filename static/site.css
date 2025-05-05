@@ -66,66 +66,69 @@ hr { /* линия между навбаром и остальным боди */
 /* Общие стили формы */
 /* Компактная форма регистрации */
 form {
-    max-width: 280px;  /* Уменьшили ширину */
-    margin: 20px auto; /* Уменьшили отступы */
-    padding: 15px;     /* Уменьшили внутренние отступы */
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 14px;   /* Уменьшили базовый размер шрифта */
+    max-width: 280px;       /* Максимальная ширина формы */
+    margin: 20px auto;      /* Отступы сверху/снизу 20px, по центру */
+    padding: 15px;          /* Внутренние отступы формы */
+    background: #ffffff;    /* Белый фон */
+    border-radius: 8px;     /* Закругленные углы */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Тень формы */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Шрифт */
+    font-size: 14px;        /* Базовый размер текста */
 }
 
 /* Заголовок формы */
 .message {
-    display: block;
-    text-align: center;
-    font-size: 20px;   /* Уменьшили размер */
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 15px; /* Уменьшили отступ */
+    display: block;         /* Блочное отображение */
+    text-align: center;     /* Выравнивание по центру */
+    font-size: 20px;       /* Размер шрифта */
+    font-weight: 600;      /* Полужирное начертание */
+    color: #2c3e50;        /* Цвет текста (темно-синий) */
+    margin-bottom: 15px;   /* Отступ снизу */
+    margin-top: 5px;
 }
 
 /* Элементы формы */
 form p {
-    margin-bottom: 12px; /* Уменьшили отступы между полями */
+    margin-bottom: 12px; /* Отступ между блоками полей */
 }
 
 /* Метки и поля ввода */
 form label {
-    display: block;
-    margin-bottom: 5px; /* Уменьшили отступ */
-    font-weight: 500;
-    color: #34495e;
-    font-size: 13px;    /* Уменьшили размер */
+    display: block;        /* Метка как блок (на отдельной строке) */
+    margin-top: 5px;
+    margin-bottom: 5px;    /* Отступ снизу */
+    font-weight: 500;      /* Средняя жирность */
+    color: #34495e;        /* Цвет текста */
+    font-size: 13px;       /* Размер шрифта */
 }
 
 form input[type="text"],
 form input[type="password"],
-form input[type="email"] {  /* Добавили email для регистрации */
-    width: 100%; /* Занимает всю ширину родителя */
-    max-width: 250px; /* Фиксированная максимальная ширина */
-    padding: 8px 12px;   /* Уменьшили padding */
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 13px;     /* Уменьшили размер шрифта */
+form input[type="email"] {
+    width: 100%;          /* Ширина 100% от родителя */
+    max-width: 250px;     /* Максимальная ширина */
+    padding: 8px 12px;    /* Внутренние отступы */
+    border: 1px solid #ddd; /* Серая рамка */
+    border-radius: 4px;   /* Закругление углов */
+    font-size: 13px;      /* Размер шрифта */
 }
 
 /* Кнопка отправки */
 form input[type="submit"] {
-    padding: 8px 15px;   /* Уменьшили размер */
-    font-size: 14px;
-    margin-top: 5px;     /* Уменьшили отступ */
+    padding: 8px 15px;    /* Размер кнопки */
+    font-size: 14px;      /* Размер текста */
+    margin-top: 5px;      /* Отступ сверху */
 }
 
 /* Ссылка "Войти" */
 form a {
-    margin-left: 10px;   /* Уменьшили отступ */
-    font-size: 13px;
+    margin-left: 10px;    /* Отступ слева */
+    font-size: 13px;      /* Размер шрифта */
 }
 
-/* Ошибки валидации */
-form span[style*="color: red"] {
-    font-size: 12px;     /* Уменьшили размер */
-    margin-top: 3px;     /* Уменьшили отступ */
+.error {
+    display: block;
+    color: #d9534f;
+    font-size: 12px;
+    margin-top: 3px;
 }

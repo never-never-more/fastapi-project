@@ -1,11 +1,14 @@
 {% extends "layout.html" %}
 {% block title %}
-Login
+Registration
 {% endblock %}
 {% block content %}
 <form action="" method="post">
     <p><span class="message">Sign Up</span></p>
     <div class="form-group">
+        {% if error %}
+            <span class="error"> {{ error }} </span>
+        {% endif %}
         <label for="username">Username:</label>
         <input type="text" class="form-control" id="username" name="username" required>
     </div>
@@ -20,6 +23,6 @@ Login
     </div>
 
     <button type="submit" class="btn-primary">Sign Up</button>
-    <a href="/registr" class="btn-link">Sign In</a>
+    <a href="/login" class="btn-link">Sign In</a>
 </form>
 {% endblock %}

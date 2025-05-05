@@ -2,10 +2,8 @@ from fastapi import FastAPI, Path, Query, Body, Request, Form, status, Depends, 
 from fastapi.responses import  HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi import Cookie
-from pydantic import BaseModel, field_validator, ValidationError
 from datetime import datetime
-from schemas import LoginForm, UserCreate, UserResponse
+from schemas import UserResponse
 from passlib.context import CryptContext
 from dependencies import get_db
 from sqlalchemy.orm import Session
@@ -39,22 +37,26 @@ async def get_contact(request: Request):
 
 
 #   Авторизация --------------------------------------------------------------------------------------------
+
 @app.get("/login", response_class=HTMLResponse)                             #   Получить HTML страницу логин
 async def get_login(request: Request):
     return templates.TemplateResponse(request=request, name="login.html")
 
 @app.post("/login")                                                         #   Создать POST запрос 
-async def post_login(   db: Session = Depends(get_db),
+async def post_login(   request: Request,
+                        db: Session = Depends(get_db),
                         username: str = Form(...),
-                        password: str = Form(...)   ):
+                        password: str = Form(...)       ):
     
-    form_data = LoginForm(  username=username,                              #   Создать логин форму
-                            password=password   )
     user = db.query(User).filter(User.username == username).first()
     if not user or not verify_pass(password, user.hash_pass):
-        raise HTTPException(
-            status_code=401,
-            detail="Incorrect username or password"
+        return templates.TemplateResponse(
+            "login.html",
+            {
+                "request": request,
+                "error": "Неверное имя пользователя или пароль",
+            },
+            status_code=401
         )
 
 
@@ -73,42 +75,67 @@ def verify_pass(plain_pass, hash_pass):
 def get_pass_hash(passw):
     return pwd_context.hash(passw)
 
-#   Регистрация --------------------------------------------------------------------------------------------
+
+#   Регистрация ---------------------------------------------------------------------------------------------
+
 @app.get("/registr", response_class=HTMLResponse)
 async def get_registr(request: Request):
     return templates.TemplateResponse(request=request, name="registr.html")
 
 @app.post("/registr", response_model=UserResponse)
 
-async def registr(  username: str = Form(...),
+async def registr(  request: Request,
+                    username: str = Form(...),
                     email: str = Form(...),
                     password: str = Form(...),
-                    db: Session = Depends(get_db)   ):
+                    db: Session = Depends(get_db)  ):
     
     db_user = db.query(User).filter(User.username == username).first()
     if db_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
+        return templates.TemplateResponse(
+            "registr.html",
+            {
+                "request": request,
+                "error": "Пользователь уже существует",
+            },
+            status_code=401
+        )
     db_email = db.query(User).filter(User.email == email).first()
     if db_email:
-        raise HTTPException(status_code=400, detail="Email already registered")
-
+        return templates.TemplateResponse(
+            "registr.html",
+            {
+                "request": request,
+                "error": "email уже используется",
+            },
+            status_code=401
+        )
+    if len(username) < 3 or len(email) < 5 or len(password) < 3:
+        return templates.TemplateResponse(
+            "registr.html",
+            {
+                "request": request,
+                "error": "Минимальная длина username - 3, email - 5, password - 3",
+            },
+            status_code=401
+        )
     hpass = get_pass_hash(password)
 
-    new_user = User(
-        username=username,
-        email=email,
-        hash_pass=hpass
-    )
+    new_user = User(    username=username,
+                        email=email,
+                        hash_pass=hpass     )
 
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    
+
     response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)     #   редирект на домашнюю страницу
     response.set_cookie(key="username", value=username)                     #   с юзернеймом
     return response
 
-#   Личный Кабинет -----------------------------------------------------------------------------------------
+
+#   Личный Кабинет ------------------------------------------------------------------------------------------
+
 @app.get("/account", response_class=HTMLResponse)
 async def get_account(request: Request):
     username = request.cookies.get("username")
