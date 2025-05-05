@@ -11,9 +11,3 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 #   Базовый класс для моделей
 Base = declarative_base()
-
-def create_tables():
-    Base.metadata.create_all(bind=engine)
-
-if __name__ == "__main__":
-    create_tables()

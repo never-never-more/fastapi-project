@@ -38,7 +38,7 @@ async def get_contact(request: Request):
       {"request":request, "username": username, "date":datetime.now()})
 
 
-#   Авторизация
+#   Авторизация --------------------------------------------------------------------------------------------
 @app.get("/login", response_class=HTMLResponse)                             #   Получить HTML страницу логин
 async def get_login(request: Request):
     return templates.TemplateResponse(request=request, name="login.html")
@@ -50,7 +50,7 @@ async def post_login(   db: Session = Depends(get_db),
     
     form_data = LoginForm(  username=username,                              #   Создать логин форму
                             password=password   )
-    user = db.query(User).filter(User.username == username).first
+    user = db.query(User).filter(User.username == username).first()
     if not user or not verify_pass(password, user.hash_pass):
         raise HTTPException(
             status_code=401,
@@ -73,34 +73,42 @@ def verify_pass(plain_pass, hash_pass):
 def get_pass_hash(passw):
     return pwd_context.hash(passw)
 
-#   Регистрация
+#   Регистрация --------------------------------------------------------------------------------------------
 @app.get("/registr", response_class=HTMLResponse)
 async def get_registr(request: Request):
     return templates.TemplateResponse(request=request, name="registr.html")
 
 @app.post("/registr", response_model=UserResponse)
-async def registr(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(User).filter(User.username == user.username).first()
+
+async def registr(  username: str = Form(...),
+                    email: str = Form(...),
+                    password: str = Form(...),
+                    db: Session = Depends(get_db)   ):
+    
+    db_user = db.query(User).filter(User.username == username).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
-    db_email = db.query(User).filter(User.email == user.email).first()
+    db_email = db.query(User).filter(User.email == email).first()
     if db_email:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    hashed_pass = get_pass_hash(user.password)
+    hpass = get_pass_hash(password)
 
     new_user = User(
-        username=user.username,
-        email=user.email,
-        hashed_pass=user.password
+        username=username,
+        email=email,
+        hash_pass=hpass
     )
 
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return new_user
+    
+    response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)     #   редирект на домашнюю страницу
+    response.set_cookie(key="username", value=username)                     #   с юзернеймом
+    return response
 
-#   Личный Кабинет
+#   Личный Кабинет -----------------------------------------------------------------------------------------
 @app.get("/account", response_class=HTMLResponse)
 async def get_account(request: Request):
     username = request.cookies.get("username")
