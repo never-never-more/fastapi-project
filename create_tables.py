@@ -1,5 +1,5 @@
 from database import Base, engine
-from models import User
+from models import User, Post
 
 def create_tables():
     Base.metadata.create_all(bind=engine)

@@ -1,4 +1,6 @@
 from pydantic import BaseModel, EmailStr, field_validator
+from datetime import datetime
+
 
 class LoginForm(BaseModel):
     username: str
@@ -54,5 +56,19 @@ class UserResponse(BaseModel):
 
     class Config:
         #   объектно-реляционное отображение
+        orm_mode = True
+
+class PostCreate(BaseModel):
+    title: str
+    content: str
+
+class PostResponse(BaseModel):
+    id: int
+    title: str
+    content: str
+    created_at: datetime
+    author: UserResponse
+
+    class Config:
         orm_mode = True
 

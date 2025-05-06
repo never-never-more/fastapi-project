@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime, 
+from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime
+from sqlalchemy.orm import relationship
 from database import Base
 from datetime import datetime
 
@@ -11,6 +12,9 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hash_pass = Column(String)
 
+    posts = relationship("Post", back_populates="author")
+    
+
 class Post(Base):
     __tablename__="posts"
 
@@ -19,4 +23,4 @@ class Post(Base):
     content = Column(Text, nullable=False)
     author_id = Column(Integer, ForeignKey('users.id'))
     date = Column(DateTime, default=datetime.now)
-    
+    author = relationship("User", back_populates="posts")

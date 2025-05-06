@@ -2,12 +2,37 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 
-    <span class="message">Home page</span>
-    {%if username %}
-            <p>Hello there, {{ username }}!</p> 
-            It's {{ date.strftime("%A, %d %B, %Y at %X") }}.
-    {% else %}
-            <p>Hello, Anonymous, Sign In to see more interesting content</p>
-    {% endif %}
+<span class="message">Home page</span>
 
+<div class="blog-container">
+        {%if username %}
+        <p>Hello there, {{ username }}!</p>
+        It's {{ date.strftime("%A, %d %B, %Y at %X") }}.
+        <div class="create-post">
+                <form action="/posts" method="post">
+                        <h3>Написать пост</h3>
+                        <input type="text" name="title" placeholder="Title" required>
+                        <textarea name="content" placeholder="Enter text here" required></textarea>
+                        <button type="submit">Отправить</button>
+                </form>
+        </div>
+        {% else %}
+        <p>Hello, Anonymous, Sign In to create content</p>
+        {% endif %}
+
+        <div class="posts-list">
+                {% for post in posts %}
+                <div class="post">
+                        <h3>{{ post.title }}</h3>
+                        <p class="post-meta">
+                                {{ post.author.username }} |
+                                {{ post.date.strftime('%d.%m.%Y %H:%M') }}
+                        </p>
+                        <div class="post-content"> {{ post.content }} </div>
+                </div>
+                {% else %}
+                <p>Постов нет! Создайте первый</p>
+                {% endfor %}
+        </div>
+</div>
 {% endblock %}

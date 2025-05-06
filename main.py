@@ -7,7 +7,7 @@ from schemas import UserResponse
 from passlib.context import CryptContext
 from dependencies import get_db
 from sqlalchemy.orm import Session
-from models import User
+from models import User, Post
 
 
 app = FastAPI()
@@ -16,12 +16,38 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-@app.get("/", response_class=HTMLResponse)                                  #   Request — это класс из модуля fastapi,
-async def get_home(request: Request):                                       #   который предоставляет доступ к:
-    username = request.cookies.get("username")                              #   headers, cookies, form(), body() и т.д.
-    return templates.TemplateResponse("home.html",
-      {"request":request, "username": username, "date":datetime.now()})
 
+#   Домашняя страница -----------------------------------------------------------------------------------------------------
+
+@app.get("/", response_class=HTMLResponse)                                  #   Request — это класс из модуля fastapi,
+async def get_home(request: Request,
+                   db: Session = Depends(get_db)):                                       #   который предоставляет доступ к:
+    username = request.cookies.get("username")                              #   headers, cookies, form(), body() и т.д.
+    posts = db.query(Post).order_by(Post.date.desc()).limit(10).all()
+
+    return templates.TemplateResponse("home.html",
+      {"request":request, "username": username, "posts":posts, "date":datetime.now()})
+
+@app.post("/posts")
+async def create_post(  request: Request,
+                        title: str = Form(...),
+                        content: str = Form(...),
+                        db: Session = Depends(get_db)):
+    
+    username = request.cookies.get("username")
+    if not username:
+        response = RedirectResponse("/login", status_code=status.HTTP_302_FOUND)
+        return response
+    
+    author = db.query(User).filter(User.username == username).first()
+    new_post = Post(    title = title,
+                        content = content,
+                        author_id = author.id   )
+    db.add(new_post)
+    db.commit()
+    return RedirectResponse("/", status_code=303)
+
+#   Вкладки --------------------------------------------------------------------------------------------------------------
 
 @app.get("/about", response_class=HTMLResponse)
 async def get_about(request: Request):
