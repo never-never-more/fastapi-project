@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path, Query, Body, Request, Form, status, Depends, HTTPException
+from fastapi import FastAPI, Path, Query, Body, Request, Form, status, Depends, HTTPException, UploadFile, File
 from fastapi.responses import  HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -20,18 +20,26 @@ templates = Jinja2Templates(directory="templates")
 #   Домашняя страница -----------------------------------------------------------------------------------------------------
 
 @app.get("/", response_class=HTMLResponse)                                  #   Request — это класс из модуля fastapi,
-async def get_home(request: Request,
-                   db: Session = Depends(get_db)):                                       #   который предоставляет доступ к:
+async def get_home( request: Request,
+                    db: Session = Depends(get_db),
+                    show_form: bool = False         ):                      #   который предоставляет доступ к:
+    
     username = request.cookies.get("username")                              #   headers, cookies, form(), body() и т.д.
     posts = db.query(Post).order_by(Post.date.desc()).limit(10).all()
 
     return templates.TemplateResponse("home.html",
-      {"request":request, "username": username, "posts":posts, "date":datetime.now()})
+      {     "request":request,
+            "username": username,
+            "posts":posts,
+            "date":datetime.now(),
+            "show_form":show_form       })
+
 
 @app.post("/posts")
 async def create_post(  request: Request,
                         title: str = Form(...),
                         content: str = Form(...),
+                        image: UploadFile = File(None),
                         db: Session = Depends(get_db)):
     
     username = request.cookies.get("username")
