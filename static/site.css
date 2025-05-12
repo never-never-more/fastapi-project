@@ -216,6 +216,8 @@ form a {
     background-color: #3d7ab6;
     color: white;
     border: none;
+    font-size: 14px;
+    padding: 5px 10px;
 }
 
 .btn-outline {
@@ -256,4 +258,16 @@ form a {
 .form-group textarea {
     min-height: 200px;
     resize: vertical;
+}
+
+.text-area {
+    width: 100%;
+  height: 150px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 16px;
+  resize: none;
 }
