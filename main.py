@@ -72,9 +72,34 @@ async def create_post(  request: Request,
     return RedirectResponse("/", status_code=303)
 
 @app.post("/posts/{post_id}/delete")
-async def delete_post(post_id: int, db: Session = Depends(get_db)):
+async def delete_post(      post_id: int, 
+                            request: Request, 
+                            db: Session = Depends(get_db)      ):
+    
+    username = request.cookies.get("username")
+    if not username:
+        response = RedirectResponse("/login", status_code=status.HTTP_302_FOUND)
+        return response
+    
     post = db.query(Post).filter(Post.id == post_id).first()
+    if not post:
+        response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+        return response
 
+    author = db.query(User).filter(User.username == username).first()
+    if author.id != post.author_id:
+        response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+    
+    if post.image_path:
+        try:
+            os.remove(f"static{post.image_path.split('static')[-1]}")
+        except Exception as e:
+            response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+            return response
+        
+    db.delete(post)
+    db.commit()
+    return RedirectResponse("/", status_code=303)
 
 #   Вкладки --------------------------------------------------------------------------------------------------------------
 

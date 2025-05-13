@@ -65,7 +65,7 @@ hr { /* линия между навбаром и остальным боди */
 
 /* Общие стили формы */
 /* Компактная форма регистрации */
-form {
+.form-window {
     /* max-width: 280px;       Максимальная ширина формы */
     margin: 20px auto;      /* Отступы сверху/снизу 20px, по центру */
     padding: 15px;          /* Внутренние отступы формы */
@@ -225,11 +225,12 @@ form a {
 /* Стили для кнопки */
 .btn {
     display: inline-block;
-    padding: 10px 20px;
-    border-radius: 4px;
-    text-decoration: none;
+    padding: 5px 10px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
+    background-color: white;
+    color: #3d7ab6;
+    border: none;
 }
 
 .btn-primary {
@@ -237,7 +238,7 @@ form a {
     color: white;
     border: none;
     border-radius: 4px;
-    font-size: 16px;
+    font-size: 15px;
     padding: 5px 10px;
 }
 

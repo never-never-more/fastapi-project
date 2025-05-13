@@ -39,6 +39,12 @@
                         <div class="post-meta">
                                 <span class="author"> {{ post.author.username }} </span>
                                 <span class="date"> {{ post.date.strftime('%d.%m.%Y %H:%M') }} </span>
+                                {% if post.author.username == username %}
+                                        <form action="/posts/{{post.id}}/delete" method="post">
+                                                <button type="submit" class="btn"
+                                                onclick="return confirm('Точно удалить?')">Удалить</button>
+                                        </form>
+                                {% endif %}
                         </div>
                         <div class="post-content">
                                 <p>{{ post.content }}</p>
@@ -47,6 +53,7 @@
                                 {% endif %}
                                 
                         </div>
+
                 </div>
                 {% else %}
                 <p>Постов нет! Создайте первый</p>
