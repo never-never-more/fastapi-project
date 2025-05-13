@@ -61,12 +61,12 @@ hr { /* линия между навбаром и остальным боди */
 }
 
 
-/* -------------- Login/Registration form --------------- */
+/* -------------- Forms --------------- */
 
 /* Общие стили формы */
 /* Компактная форма регистрации */
 .form-window {
-    /* max-width: 280px;       Максимальная ширина формы */
+    max-width: 280px;       /* Максимальная ширина формы */
     margin: 20px auto;      /* Отступы сверху/снизу 20px, по центру */
     padding: 15px;          /* Внутренние отступы формы */
     background: #ffffff;    /* Белый фон */
@@ -75,10 +75,7 @@ hr { /* линия между навбаром и остальным боди */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Шрифт */
     font-size: 14px;        /* Базовый размер текста */
 }
-.form-sign {
-    /* Максимальная ширина формы */
-    max-width: 280px;       
-}
+
 /* Заголовок формы */
 .message {
     display: block;         /* Блочное отображение */
@@ -90,38 +87,10 @@ hr { /* линия между навбаром и остальным боди */
     margin-top: 5px;
 }
 
-/* Элементы формы */
 form p {
     margin-bottom: 12px; /* Отступ между блоками полей */
 }
 
-/* Метки и поля ввода */
-form label {
-    display: block;        /* Метка как блок (на отдельной строке) */
-    margin-top: 5px;
-    margin-bottom: 5px;    /* Отступ снизу */
-    font-weight: 500;      /* Средняя жирность */
-    color: #34495e;        /* Цвет текста */
-    font-size: 13px;       /* Размер шрифта */
-}
-
-
-form input[type="password"],
-form input[type="email"] {
-    width: 100%;          /* Ширина 100% от родителя */
-    max-width: 250px;     /* Максимальная ширина */
-    padding: 8px 12px;    /* Внутренние отступы */
-    border: 1px solid #ddd; /* Серая рамка */
-    border-radius: 4px;   /* Закругление углов */
-    font-size: 13px;      /* Размер шрифта */
-}
-
-/* Кнопка отправки */
-form input[type="submit"] {
-    padding: 8px 15px;    /* Размер кнопки */
-    font-size: 14px;      /* Размер текста */
-    margin-top: 5px;      /* Отступ сверху */
-}
 
 /* Ссылка "Войти" */
 form a {
@@ -267,7 +236,6 @@ form a {
 }
 
 .form-group {
-    
     display: block;
     width: 100%;
     margin-bottom: 15px;
@@ -282,6 +250,17 @@ form a {
     font-size: 16px;
     box-sizing: border-box;
     resize: none;
+}
+
+form input[type="username"],
+form input[type="password"],
+form input[type="email"] {
+    width: 100%;          /* Ширина 100% от родителя */
+    max-width: 250px;     /* Максимальная ширина */
+    padding: 8px 12px;    /* Внутренние отступы */
+    border: 1px solid #ddd; /* Серая рамка */
+    border-radius: 4px;   /* Закругление углов */
+    font-size: 13px;      /* Размер шрифта */
 }
 
 .form-group textarea {

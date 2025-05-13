@@ -11,6 +11,8 @@
         <a href="{{ '/?show_form=true' if not show_form else '/' }}" class="btn btn-primary">
                 {{ 'Написать пост' if not show_form else 'Скрыть форму' }}</a>
         {% if show_form %}
+        <div class="marginbottom"></div>
+        <div class="post">
         <form action="/posts" method="post" enctype="multipart/form-data">
                 <h3> Написать пост </h3>
                 <div class="form-group">
@@ -25,6 +27,7 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Отправить</button>
         </form>
+        </div>
         {% endif %}
         {% endif %}
 
