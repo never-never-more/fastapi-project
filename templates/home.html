@@ -2,33 +2,44 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 
-<span class="message">Home page</span>
+<span class="message"> Моя лента</span>
 
 <div class="blog-container">
+
+        
+
+        <!-- Интерактивная кнопка  -->
+
+
         {%if username %}
         <a href="{{ '/?show_form=true' if not show_form else '/' }}" class="btn btn-primary">
                 {{ 'Написать пост' if not show_form else 'Скрыть форму' }}</a>
-        
+
         {% if show_form %}
-        <!-- <div class="create-post-form"> -->
-                <form action="/posts" method="post" enctype="multipart/form-data" class="create-post-form">
-                        <div class="form-group">
-                                <input type="text" class="form-control" name="title" placeholder="Title" required>
-                        </div>
-                        <div class="form-group">
-                                <textarea name="content" placeholder="Enter text here" required 
-                                class="text-area"></textarea>
-                        </div>
-                        <div class="form-group">
-                                <label>Add Images</label>
-                                <input type="file" name="image">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Отправить</button>
-                </form>
-        <!-- </div> -->
+
+        <form action="/posts" method="post" enctype="multipart/form-data">
+                <h3> Написать пост </h3>
+                <div class="form-group">
+                        <input type="text" class="form-control" name="title" placeholder="Title" required>
+                </div>
+                <div class="form-group">
+                        <textarea name="content" placeholder="Enter text here" required class="text-area"></textarea>
+                </div>
+                <div class="form-group">
+                        <label>Add Images</label>
+                        <input type="file" name="image">
+                </div>
+                <button type="submit" class="btn btn-primary">Отправить</button>
+        </form>
         {% endif %}
         {% endif %}
-        <div class="post-card">
+
+        <div class="marginbottom"></div>
+
+        <!-- Карточка с постами  -->
+
+        <div>
+
                 {% for post in posts %}
                 <div class="post">
                         <h3>{{ post.title }}</h3>
@@ -36,7 +47,9 @@
                                 <span class="author"> {{ post.author.username }} </span>
                                 <span class="date"> {{ post.date.strftime('%d.%m.%Y %H:%M') }} </span>
                         </div>
-                        <div class="post-content"> <p>{{ post.content }}</p> </div>
+                        <div class="post-content">
+                                <p>{{ post.content }}</p>
+                        </div>
                 </div>
                 {% else %}
                 <p>Постов нет! Создайте первый</p>
