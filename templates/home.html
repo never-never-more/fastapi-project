@@ -3,20 +3,14 @@
 {% block content %}
 
 <span class="message"> Моя лента</span>
-
 <div class="blog-container">
 
-        
-
         <!-- Интерактивная кнопка  -->
-
 
         {%if username %}
         <a href="{{ '/?show_form=true' if not show_form else '/' }}" class="btn btn-primary">
                 {{ 'Написать пост' if not show_form else 'Скрыть форму' }}</a>
-
         {% if show_form %}
-
         <form action="/posts" method="post" enctype="multipart/form-data">
                 <h3> Написать пост </h3>
                 <div class="form-group">
@@ -39,7 +33,6 @@
         <!-- Карточка с постами  -->
 
         <div>
-
                 {% for post in posts %}
                 <div class="post">
                         <h3>{{ post.title }}</h3>
@@ -49,6 +42,10 @@
                         </div>
                         <div class="post-content">
                                 <p>{{ post.content }}</p>
+                                {% if post.image_path %}
+                                <img src=" {{ post.image_path }}" alt="Post image" class="post-image">
+                                {% endif %}
+                                
                         </div>
                 </div>
                 {% else %}

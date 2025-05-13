@@ -198,6 +198,13 @@ form a {
     margin-bottom: 20px;
 }
 
+.post-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
 /* Карточка поста */
 .post-card {
     background: #fff;

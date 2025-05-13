@@ -24,3 +24,4 @@ class Post(Base):
     author_id = Column(Integer, ForeignKey('users.id'))
     date = Column(DateTime, default=datetime.now)
     author = relationship("User", back_populates="posts")
+    image_path = Column(String, nullable=False)

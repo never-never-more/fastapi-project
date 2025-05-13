@@ -8,6 +8,8 @@ from passlib.context import CryptContext
 from dependencies import get_db
 from sqlalchemy.orm import Session
 from models import User, Post
+import os
+import uuid
 
 
 app = FastAPI()
@@ -16,6 +18,8 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
+UPLOAD_DIR = "static/uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 #   Домашняя страница -----------------------------------------------------------------------------------------------------
 
@@ -47,13 +51,30 @@ async def create_post(  request: Request,
         response = RedirectResponse("/login", status_code=status.HTTP_302_FOUND)
         return response
     
+    if image and image.filename:
+        # Генерируем уникальное имя файла
+        file_ext = os.path.splitext(image.filename)[1]  #   1st part file name 
+        file_name = f"{uuid.uuid4()}{file_ext}"         #   uuid + 1st part
+        file_path = os.path.join(UPLOAD_DIR, file_name) #   full path to file
+        with open(file_path, "wb") as buffer:
+            buffer.write(await image.read())
+            image_path = f"/static/uploads/{file_name}"
+
+
     author = db.query(User).filter(User.username == username).first()
     new_post = Post(    title = title,
                         content = content,
-                        author_id = author.id   )
+                        author_id = author.id,
+                        image_path = image_path     )
+    
     db.add(new_post)
     db.commit()
     return RedirectResponse("/", status_code=303)
+
+@app.post("/posts/{post_id}/delete")
+async def delete_post(post_id: int, db: Session = Depends(get_db)):
+    post = db.query(Post).filter(Post.id == post_id).first()
+
 
 #   Вкладки --------------------------------------------------------------------------------------------------------------
 

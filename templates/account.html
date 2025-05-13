@@ -2,14 +2,25 @@
 {% block title %}Account settings{% endblock %}
 {% block content %}
 
-    <span class="message">Account settings</span>
-    {%if username %}
-            <p>Hello there, {{ username }}!</p> 
+<span class="message">Настройки аккаунта</span>
+<div class="blog-container">
+    <div class="post">
+        <div class="post-content">
+
+
+            {%if username %}
+            <p>Hello there, {{ username }}!</p>
             It's {{ date.strftime("%A, %d %B, %Y at %X") }}.
-    {% else %}
+            {% else %}
             <p>Hello, Anonymous, Sign In to see more interesting content</p>
-    {% endif %}
-    <form action="/logout" method="post">
-        <button type="submit" class="btn-primary">Log Out</button>    
-    </form>
+            {% endif %}
+
+            <form action="/logout" method="post">
+                <button type="submit" class="btn-primary">Log Out</button>
+            </form>
+
+
+        </div>
+    </div>
+</div>
 {% endblock %}
