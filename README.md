@@ -1,4 +1,3 @@
-1
 1)  Для запуска кода создать виртуальную среду:
     python -m venv .venv (python3 for linux)
 
