@@ -5,9 +5,9 @@
 <div class="blog-container">
     <div class="post">
         <h3> Изменить пост </h3>
-        <form action="/posts" method="post" enctype="multipart/form-data">
+        <form action="/posts/{{post.id}}/edit" method="post" enctype="multipart/form-data">
             <div class="form-group">
-                <textarea name="title" required class="text-area"> {{post.title}} </textarea>
+                <input type="text" class="form-control" name="title" value="{{post.title}}" required>
             </div>
             <div class="form-group">
                 <textarea name="content" required class="text-area"> {{post.content}} </textarea>

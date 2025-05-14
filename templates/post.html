@@ -9,7 +9,7 @@
             <span class="author"> {{ post.author.username }} </span>
             <span class="date"> {{ post.date.strftime('%d.%m.%Y %H:%M') }} </span>
             {% if post.author.username == username %}
-            <a href="/post/{{post.id}}/edit" class="btn">Изменить</a>
+            <a href="/posts/{{post.id}}/edit" class="btn">Изменить</a>
             <form action="/posts/{{post.id}}/delete" method="post">
                 <button type="submit" class="btn" onclick="return confirm('Точно удалить?')">Удалить</button>
             </form>

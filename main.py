@@ -102,6 +102,20 @@ async def delete_post(      post_id: int,
     db.commit()
     return RedirectResponse("/", status_code=303)
 
+@app.get("/posts/{post_id}/edit")
+async def get_edit_post(    post_id: int,
+                            request: Request,
+                            db: Session = Depends(get_db)   ):              #   который предоставляет доступ к:
+    
+    username = request.cookies.get("username")                              #   headers, cookies, form(), body() и т.д.
+    post = db.query(Post).filter(Post.id == post_id).first()
+    if not post:
+        return RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+    return templates.TemplateResponse("post_edit.html",
+      {     "request":request,
+            "username": username,
+            "post":post             })
+
 @app.post("/posts/{post_id}/edit")
 async def edit_post(    post_id: int,
                         request: Request,
