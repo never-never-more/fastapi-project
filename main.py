@@ -24,9 +24,9 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 #   Домашняя страница -----------------------------------------------------------------------------------------------------
 
 @app.get("/", response_class=HTMLResponse)                                  #   Request — это класс из модуля fastapi,
-async def get_home( request: Request,
-                    db: Session = Depends(get_db),
-                    show_form: bool = False         ):                      #   который предоставляет доступ к:
+async def get_home(     request: Request,
+                        db: Session = Depends(get_db),
+                        show_form: bool = False             ):              #   который предоставляет доступ к:
     
     username = request.cookies.get("username")                              #   headers, cookies, form(), body() и т.д.
     posts = db.query(Post).order_by(Post.date.desc()).limit(10).all()
@@ -71,9 +71,10 @@ async def create_post(  request: Request,
     db.commit()
     return RedirectResponse("/", status_code=303)
 
+
 @app.post("/posts/{post_id}/delete")
-async def delete_post(      post_id: int, 
-                            request: Request, 
+async def delete_post(      post_id: int,
+                            request: Request,
                             db: Session = Depends(get_db)      ):
     
     username = request.cookies.get("username")
@@ -100,6 +101,62 @@ async def delete_post(      post_id: int,
     db.delete(post)
     db.commit()
     return RedirectResponse("/", status_code=303)
+
+@app.post("/posts/{post_id}/edit")
+async def edit_post(    post_id: int,
+                        request: Request,
+                        title: str = Form(...),
+                        content: str = Form(...),
+                        image: UploadFile = File(None),
+                        db: Session = Depends(get_db)   ):
+
+    username = request.cookies.get("username")
+    post = db.query(Post).filter(Post.id == post_id).first()
+    if not post:
+        return RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+    if not username or post.author != username:
+        return RedirectResponse("/login", status_code=status.HTTP_302_FOUND)
+    
+    if image and image.filename:
+        if post.image_path:
+            try:
+                os.remove(f"static{post.image_path.split('/static')[-1]}")
+            except Exception as e:
+                print(f"Error deleting old image: {e}")
+        
+        # Генерируем уникальное имя файла
+        file_ext = os.path.splitext(image.filename)[1]  #   1st part file name 
+        file_name = f"{uuid.uuid4()}{file_ext}"         #   uuid + 1st part
+        file_path = os.path.join(UPLOAD_DIR, file_name) #   full path to file
+        with open(file_path, "wb") as buffer:
+            buffer.write(await image.read())
+        
+        post.image_path = f"/static/uploads/{file_name}"
+    
+    post.title = title
+    post.content = content
+    post.updated_at = datetime.utcnow()
+    
+    db.commit()
+    
+    return RedirectResponse("/", status_code=303)
+
+
+
+#   Страница поста -------------------------------------------------------------------------------------------------------
+
+@app.get("/posts/{post_id}", response_class=HTMLResponse)
+async def get_post(     post_id: int,
+                        request: Request,
+                        db: Session = Depends(get_db)   ):
+    
+    username = request.cookies.get("username")
+    post = db.query(Post).filter(Post.id == post_id).first()
+    return templates.TemplateResponse("post.html", {
+        "request" : request,
+        "username": username,
+        "post": post
+    })
 
 #   Вкладки --------------------------------------------------------------------------------------------------------------
 
@@ -212,6 +269,7 @@ async def registr(  request: Request,
     response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)     #   редирект на домашнюю страницу
     response.set_cookie(key="username", value=username)                     #   с юзернеймом
     return response
+
 
 
 #   Личный Кабинет ------------------------------------------------------------------------------------------

@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="blog-container">
+    <div class="post">
+        <h3> Изменить пост </h3>
+        <form action="/posts" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <textarea name="title" required class="text-area"> {{post.title}} </textarea>
+            </div>
+            <div class="form-group">
+                <textarea name="content" required class="text-area"> {{post.content}} </textarea>
+            </div>
+            <div class="form-group">
+                <label>Add Images</label>
+                <input type="file" name="image">
+            </div>
+            <button type="submit" class="btn btn-primary">Выложить!</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

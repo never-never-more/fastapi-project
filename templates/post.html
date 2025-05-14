@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="blog-container">
+    <div class="post">
+        <h3>{{ post.title }}</h3>
+        <div class="post-meta">
+            <span class="author"> {{ post.author.username }} </span>
+            <span class="date"> {{ post.date.strftime('%d.%m.%Y %H:%M') }} </span>
+            {% if post.author.username == username %}
+            <a href="/post/{{post.id}}/edit" class="btn">Изменить</a>
+            <form action="/posts/{{post.id}}/delete" method="post">
+                <button type="submit" class="btn" onclick="return confirm('Точно удалить?')">Удалить</button>
+            </form>
+            {% endif %}
+        </div>
+        <div class="post-content">
+            <p>{{ post.content }}</p>
+            {% if post.image_path %}
+            <img src=" {{ post.image_path }}" alt="Post image" class="post-image">
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

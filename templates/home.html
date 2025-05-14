@@ -13,20 +13,21 @@
         {% if show_form %}
         <div class="marginbottom"></div>
         <div class="post">
-        <form action="/posts" method="post" enctype="multipart/form-data">
-                <h3> Написать пост </h3>
-                <div class="form-group">
-                        <input type="text" class="form-control" name="title" placeholder="Title" required>
-                </div>
-                <div class="form-group">
-                        <textarea name="content" placeholder="Enter text here" required class="text-area"></textarea>
-                </div>
-                <div class="form-group">
-                        <label>Add Images</label>
-                        <input type="file" name="image">
-                </div>
-                <button type="submit" class="btn btn-primary">Отправить</button>
-        </form>
+                <form action="/posts" method="post" enctype="multipart/form-data">
+                        <h3> Написать пост </h3>
+                        <div class="form-group">
+                                <input type="text" class="form-control" name="title" placeholder="Title" required>
+                        </div>
+                        <div class="form-group">
+                                <textarea name="content" placeholder="Enter text here" required
+                                        class="text-area"></textarea>
+                        </div>
+                        <div class="form-group">
+                                <label>Add Images</label>
+                                <input type="file" name="image">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Выложить!</button>
+                </form>
         </div>
         {% endif %}
         {% endif %}
@@ -35,32 +36,33 @@
 
         <!-- Карточка с постами  -->
 
-        <div>
+        <div class="post">
                 {% for post in posts %}
-                <div class="post">
+                <a href="/posts/{{post.id}}">
                         <h3>{{ post.title }}</h3>
-                        <div class="post-meta">
-                                <span class="author"> {{ post.author.username }} </span>
-                                <span class="date"> {{ post.date.strftime('%d.%m.%Y %H:%M') }} </span>
-                                {% if post.author.username == username %}
-                                        <form action="/posts/{{post.id}}/delete" method="post">
-                                                <button type="submit" class="btn"
-                                                onclick="return confirm('Точно удалить?')">Удалить</button>
-                                        </form>
-                                {% endif %}
-                        </div>
-                        <div class="post-content">
-                                <p>{{ post.content }}</p>
-                                {% if post.image_path %}
-                                <img src=" {{ post.image_path }}" alt="Post image" class="post-image">
-                                {% endif %}
-                                
-                        </div>
+                </a>
+                <div class="post-meta">
+                        <span class="author"> {{ post.author.username }} </span>
+                        <span class="date"> {{ post.date.strftime('%d.%m.%Y %H:%M') }} </span>
+                        {% if post.author.username == username %}
+                        <a href="/posts/{{post.id}}/edit" class="btn">Изменить</a>
+                        <form action="/posts/{{post.id}}/delete" method="post">
+                                <button type="submit" class="btn"
+                                        onclick="return confirm('Точно удалить?')">Удалить</button>
+                        </form>
+                        {% endif %}
+                </div>
+                <div class="post-content">
+                        <p>{{ post.content }}</p>
+                        {% if post.image_path %}
+                        <img src=" {{ post.image_path }}" alt="Post image" class="post-image">
+                        {% endif %}
 
                 </div>
                 {% else %}
                 <p>Постов нет! Создайте первый</p>
                 {% endfor %}
         </div>
+
 </div>
 {% endblock %}
