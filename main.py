@@ -122,13 +122,14 @@ async def edit_post(    post_id: int,
                         title: str = Form(...),
                         content: str = Form(...),
                         image: UploadFile = File(None),
-                        db: Session = Depends(get_db)   ):
+                        db: Session = Depends(get_db)       ):
 
     username = request.cookies.get("username")
     post = db.query(Post).filter(Post.id == post_id).first()
+    author = db.query(User).filter(User.username == username).first()
     if not post:
         return RedirectResponse("/", status_code=status.HTTP_302_FOUND)
-    if not username or post.author != username:
+    if not username or (author.id != post.id):
         return RedirectResponse("/login", status_code=status.HTTP_302_FOUND)
     
     if image and image.filename:

@@ -25,3 +25,12 @@ class Post(Base):
     date = Column(DateTime, default=datetime.now)
     author = relationship("User", back_populates="posts")
     image_path = Column(String, nullable=False)
+
+class Comment(Base):
+    __tablename__="comms"
+
+    id = Column(Integer, primary_key=True, index=True)
+    content = Column(Text, nullable=False)
+    author_id = Column(Integer, ForeignKey('users.id'))
+    date = Column(DateTime, default=datetime.now)
+    
