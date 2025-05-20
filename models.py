@@ -13,7 +13,7 @@ class User(Base):
     hash_pass = Column(String)
 
     posts = relationship("Post", back_populates="author")
-    
+    comments = relationship("Comment", back_populates="author")
 
 class Post(Base):
     __tablename__="posts"
@@ -23,14 +23,20 @@ class Post(Base):
     content = Column(Text, nullable=False)
     author_id = Column(Integer, ForeignKey('users.id'))
     date = Column(DateTime, default=datetime.now)
-    author = relationship("User", back_populates="posts")
     image_path = Column(String, nullable=False)
+    
+    author = relationship("User", back_populates="posts")
+    comments = relationship("Comment", back_populates="posts")
+
 
 class Comment(Base):
-    __tablename__="comms"
+    __tablename__="comments"
 
     id = Column(Integer, primary_key=True, index=True)
     content = Column(Text, nullable=False)
-    author_id = Column(Integer, ForeignKey('users.id'))
+    author_id = Column(Integer, ForeignKey('posts.id'))
     date = Column(DateTime, default=datetime.now)
-    
+    post_id = Column(Integer, index=True)
+
+    author = relationship("User", back_populates="comments")
+    posts = relationship("Post", back_populates="comments")

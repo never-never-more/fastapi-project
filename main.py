@@ -7,7 +7,7 @@ from schemas import UserResponse
 from passlib.context import CryptContext
 from dependencies import get_db
 from sqlalchemy.orm import Session
-from models import User, Post
+from models import Comment, User, Post
 import os
 import uuid
 
@@ -38,13 +38,14 @@ async def get_home(     request: Request,
             "date":datetime.now(),
             "show_form":show_form       })
 
+#   Создание поста -------------------------------------------------------------------------------------------------------
 
 @app.post("/posts")
 async def create_post(  request: Request,
                         title: str = Form(...),
                         content: str = Form(...),
                         image: UploadFile = File(None),
-                        db: Session = Depends(get_db)):
+                        db: Session = Depends(get_db)   ):
     
     username = request.cookies.get("username")
     if not username:
@@ -71,6 +72,7 @@ async def create_post(  request: Request,
     db.commit()
     return RedirectResponse("/", status_code=303)
 
+# Удаление поста --------------------------------------------------------------------------------------------------------
 
 @app.post("/posts/{post_id}/delete")
 async def delete_post(      post_id: int,
@@ -102,6 +104,8 @@ async def delete_post(      post_id: int,
     db.commit()
     return RedirectResponse("/", status_code=303)
 
+#   Страница редактирования поста   ---------------------------------------------------------------------------------------
+
 @app.get("/posts/{post_id}/edit")
 async def get_edit_post(    post_id: int,
                             request: Request,
@@ -115,6 +119,8 @@ async def get_edit_post(    post_id: int,
       {     "request":request,
             "username": username,
             "post":post             })
+
+#   Редактирование поста    ----------------------------------------------------------------------------------------------
 
 @app.post("/posts/{post_id}/edit")
 async def edit_post(    post_id: int,
@@ -167,10 +173,12 @@ async def get_post(     post_id: int,
     
     username = request.cookies.get("username")
     post = db.query(Post).filter(Post.id == post_id).first()
+    comments = db.query(Comment).filter(Comment.post_id == post.id).all()
     return templates.TemplateResponse("post.html", {
         "request" : request,
         "username": username,
-        "post": post
+        "post": post,
+        "comments": comments
     })
 
 #   Вкладки --------------------------------------------------------------------------------------------------------------

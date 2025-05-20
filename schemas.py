@@ -56,7 +56,7 @@ class UserResponse(BaseModel):
 
     class Config:
         #   объектно-реляционное отображение
-        orm_mode = True
+        from_attributes = True
 
 class PostCreate(BaseModel):
     title: str
@@ -70,5 +70,17 @@ class PostResponse(BaseModel):
     author: UserResponse
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+class CommentCreate(BaseModel):
+    content: str
+
+class CommentResponse(BaseModel):
+    id: int
+    content: str
+    created_at: datetime
+    author: UserResponse
+
+    class Config:
+        from_attributes = True
 
