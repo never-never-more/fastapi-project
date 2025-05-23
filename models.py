@@ -23,7 +23,7 @@ class Post(Base):
     content = Column(Text, nullable=False)
     author_id = Column(Integer, ForeignKey('users.id'))
     date = Column(DateTime, default=datetime.now)
-    image_path = Column(String, nullable=False)
+    image_path = Column(String)
     
     author = relationship("User", back_populates="posts")
     comments = relationship("Comment", back_populates="posts")
@@ -34,9 +34,9 @@ class Comment(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     content = Column(Text, nullable=False)
-    author_id = Column(Integer, ForeignKey('posts.id'))
+    author_id = Column(Integer, ForeignKey('users.id'))
     date = Column(DateTime, default=datetime.now)
-    post_id = Column(Integer, index=True)
+    post_id = Column(Integer, ForeignKey('posts.id'))
 
     author = relationship("User", back_populates="comments")
     posts = relationship("Post", back_populates="comments")

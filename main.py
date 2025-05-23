@@ -52,6 +52,7 @@ async def create_post(  request: Request,
         response = RedirectResponse("/login", status_code=status.HTTP_302_FOUND)
         return response
     
+    image_path = None
     if image and image.filename:
         # Генерируем уникальное имя файла
         file_ext = os.path.splitext(image.filename)[1]  #   1st part file name 
