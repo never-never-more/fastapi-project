@@ -1,70 +1,33 @@
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 
 
 class LoginForm(BaseModel):
-    username: str
-    password: str
+    username: str = Field(min_length=3)
+    password: str = Field(min_length=3)
 
-    @field_validator("username")
-    def username_length(cls, v):                            #   cls — это ссылка на сам класс (в данном случае на класс LoginForm).
-                                                            #   Он аналогичен self, но работает на уровне класса, а не экземпляра.
-        if len(v) < 3:
-            raise ValueError("Username length too short")
-        return v
-    
-    @field_validator("password")
-    def password_length(cls, v):
-        if len(v) < 3:
-            raise ValueError("Password length too short")
-        return v
-
-class RegistrForm(BaseModel):
-    username: str
-    email: str
-    password: str
-
-    @field_validator("username")
-    def username_length(cls, v):                            #   cls — это ссылка на сам класс (в данном случае на класс LoginForm).
-                                                            #   Он аналогичен self, но работает на уровне класса, а не экземпляра.
-        if len(v) < 3:
-            raise ValueError("Username length too short")
-        return v
-
-    @field_validator("email")
-    def email_length(cls, v):
-        if len(v) < 5:
-            raise ValueError("Email length too short")
-        return v
-
-    @field_validator("password")
-    def password_length(cls, v):
-        if len(v) < 3:
-            raise ValueError("Password length too short")
-        return v
-
-
-class UserCreate(BaseModel):
-    username: str
+class RegistrSchema(BaseModel):
+    username: str = Field(min_length=3)
     email: EmailStr
-    password: str
+    password: str = Field(min_length=3)
+
 
 class UserResponse(BaseModel):
     id: int
-    username: str
-    email: str
+    username: str = Field(min_length=3)
+    email: EmailStr
 
     class Config:
         #   объектно-реляционное отображение
         from_attributes = True
 
 class PostCreate(BaseModel):
-    title: str
+    title: str = Field(min_length=3, max_length=20)
     content: str
 
 class PostResponse(BaseModel):
     id: int
-    title: str
+    title: str = Field(min_length=3, max_length=20)
     content: str
     created_at: datetime
     author: UserResponse

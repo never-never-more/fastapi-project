@@ -1,12 +1,15 @@
-from fastapi import FastAPI, Path, Query, Body, Request, Form, status, Depends, HTTPException, UploadFile, File
+from typing import Annotated
+from fastapi import FastAPI, Request, Form, status, Depends, HTTPException, UploadFile, File
 from fastapi.responses import  HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from datetime import datetime
-from schemas import UserResponse
+
+import uvicorn
+from schemas import RegistrSchema
 from passlib.context import CryptContext
-from dependencies import get_db
-from sqlalchemy.orm import Session
+from database import engine, Base, get_db
+from sqlalchemy.ext.asyncio import AsyncSession
 from models import Comment, User, Post
 import os
 import uuid
@@ -21,11 +24,13 @@ templates = Jinja2Templates(directory="templates")
 UPLOAD_DIR = "static/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+SessionDep = Annotated[AsyncSession, Depends(get_db)]
+
 #   Домашняя страница -----------------------------------------------------------------------------------------------------
 
 @app.get("/", response_class=HTMLResponse)                                  #   Request — это класс из модуля fastapi,
 async def get_home(     request: Request,
-                        db: Session = Depends(get_db),
+                        db: SessionDep,
                         show_form: bool = False             ):              #   который предоставляет доступ к:
     
     username = request.cookies.get("username")                              #   headers, cookies, form(), body() и т.д.
@@ -42,10 +47,11 @@ async def get_home(     request: Request,
 
 @app.post("/posts")
 async def create_post(  request: Request,
+                        db: SessionDep,   
                         title: str = Form(...),
                         content: str = Form(...),
                         image: UploadFile = File(None),
-                        db: Session = Depends(get_db)   ):
+                        ):
     
     username = request.cookies.get("username")
     if not username:
@@ -78,7 +84,7 @@ async def create_post(  request: Request,
 @app.post("/posts/{post_id}/delete")
 async def delete_post(      post_id: int,
                             request: Request,
-                            db: Session = Depends(get_db)      ):
+                            db: SessionDep      ):
     
     username = request.cookies.get("username")
     if not username:
@@ -110,7 +116,7 @@ async def delete_post(      post_id: int,
 @app.get("/posts/{post_id}/edit")
 async def get_edit_post(    post_id: int,
                             request: Request,
-                            db: Session = Depends(get_db)   ):              #   который предоставляет доступ к:
+                            db: SessionDep   ):              #   который предоставляет доступ к:
     
     username = request.cookies.get("username")                              #   headers, cookies, form(), body() и т.д.
     post = db.query(Post).filter(Post.id == post_id).first()
@@ -126,10 +132,11 @@ async def get_edit_post(    post_id: int,
 @app.post("/posts/{post_id}/edit")
 async def edit_post(    post_id: int,
                         request: Request,
+                        db: SessionDep,
                         title: str = Form(...),
                         content: str = Form(...),
                         image: UploadFile = File(None),
-                        db: Session = Depends(get_db)       ):
+                        ):
 
     username = request.cookies.get("username")
     post = db.query(Post).filter(Post.id == post_id).first()
@@ -170,7 +177,7 @@ async def edit_post(    post_id: int,
 @app.get("/posts/{post_id}", response_class=HTMLResponse)
 async def get_post(     post_id: int,
                         request: Request,
-                        db: Session = Depends(get_db)   ):
+                        db: SessionDep   ):
     
     username = request.cookies.get("username")
     post = db.query(Post).filter(Post.id == post_id).first()
@@ -205,7 +212,7 @@ async def get_login(request: Request):
 
 @app.post("/login")                                                         #   Создать POST запрос 
 async def post_login(   request: Request,
-                        db: Session = Depends(get_db),
+                        db: SessionDep,
                         username: str = Form(...),
                         password: str = Form(...)       ):
     
@@ -239,59 +246,33 @@ def get_pass_hash(passw):
 
 #   Регистрация ---------------------------------------------------------------------------------------------
 
-@app.get("/registr", response_class=HTMLResponse)
+@app.get("/registr", response_class=HTMLResponse, tags=["Registration"], summary="Get Registration page")
 async def get_registr(request: Request):
     return templates.TemplateResponse(request=request, name="registr.html")
 
-@app.post("/registr", response_model=UserResponse)
-
-async def registr(  request: Request,
-                    username: str = Form(...),
-                    email: str = Form(...),
-                    password: str = Form(...),
-                    db: Session = Depends(get_db)  ):
+@app.post("/registr", tags=["Registration"], summary="Add new User to database")
+async def registr(new_user: RegistrSchema, 
+                  db: SessionDep):
     
-    db_user = db.query(User).filter(User.username == username).first()
+    db_user = db.query(User).filter(User.username == new_user.username).first()
     if db_user:
-        return templates.TemplateResponse(
-            "registr.html",
-            {
-                "request": request,
-                "error": "Пользователь уже существует",
-            },
-            status_code=401
-        )
-    db_email = db.query(User).filter(User.email == email).first()
+        raise HTTPException(status_code=401, detail="Username allready exist!")
+    
+    db_email = db.query(User).filter(User.email == new_user.email).first()
     if db_email:
-        return templates.TemplateResponse(
-            "registr.html",
-            {
-                "request": request,
-                "error": "email уже используется",
-            },
-            status_code=401
-        )
-    if len(username) < 3 or len(email) < 5 or len(password) < 3:
-        return templates.TemplateResponse(
-            "registr.html",
-            {
-                "request": request,
-                "error": "Минимальная длина username - 3, email - 5, password - 3",
-            },
-            status_code=401
-        )
-    hpass = get_pass_hash(password)
+        raise HTTPException(status_code=401, detail="E-mail allready exist!")
+    
+    hpass = get_pass_hash(new_user.password)
 
-    new_user = User(    username=username,
-                        email=email,
-                        hash_pass=hpass     )
-
+    new_user = User(    username = new_user.username,
+                        email = new_user.email,
+                        hash_pass = hpass              )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
 
     response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)     #   редирект на домашнюю страницу
-    response.set_cookie(key="username", value=username)                     #   с юзернеймом
+    response.set_cookie(key="username", value=new_user.username)            #   с юзернеймом
     return response
 
 
@@ -309,3 +290,15 @@ async def logout(request: Request):
     response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
     response.delete_cookie("username")
     return response
+
+
+@app.post("/create_db")
+async def create_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+
+    return {"Status": "Ok"}
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", reload=True)
