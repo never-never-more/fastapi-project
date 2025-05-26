@@ -24,7 +24,7 @@ templates = Jinja2Templates(directory="templates")
 UPLOAD_DIR = "static/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-SessionDep = Annotated[AsyncSession, Depends(get_db)]
+SessionDep = Annotated[AsyncSession, Depends(get_db)]                       #   Создаем переменную запуска сессий
 
 #   Домашняя страница -----------------------------------------------------------------------------------------------------
 
@@ -291,8 +291,9 @@ async def logout(request: Request):
     response.delete_cookie("username")
     return response
 
+#   Функция для создания пустых таблиц БД -------------------------------------------------------------------
 
-@app.post("/create_db")
+@app.post("/create_db")                         
 async def create_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)

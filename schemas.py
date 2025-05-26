@@ -1,7 +1,9 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 
-
+# Здесь создаются классы моделей типа Pydantic
+# которые нужны для валидации получаемых данных
+#  
 class LoginForm(BaseModel):
     username: str = Field(min_length=3)
     password: str = Field(min_length=3)

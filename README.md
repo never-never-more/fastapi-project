@@ -6,7 +6,10 @@
 
 3)  Запустить веб сервер:
     uvicorn main:app --reload
-
+    или
+    Если есть функция main в main то можно просто:
+    python main.py
+    
 4)  Периодически обновлять список зависимостей:
     pip freeze > requirements.txt
 
