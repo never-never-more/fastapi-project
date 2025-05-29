@@ -254,11 +254,11 @@ async def get_registr(request: Request):
 async def registr(new_user: RegistrSchema, 
                   db: SessionDep):
     
-    db_user = db.query(User).filter(User.username == new_user.username).first()
+    db_user = await db.query(User).filter(User.username == new_user.username).first()
     if db_user:
         raise HTTPException(status_code=401, detail="Username allready exist!")
     
-    db_email = db.query(User).filter(User.email == new_user.email).first()
+    db_email = await db.query(User).filter(User.email == new_user.email).first()
     if db_email:
         raise HTTPException(status_code=401, detail="E-mail allready exist!")
     
