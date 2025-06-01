@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from datetime import datetime
 
+from sqlalchemy import select
 import uvicorn
 from schemas import RegistrSchema
 from passlib.context import CryptContext
@@ -206,11 +207,11 @@ async def get_contact(request: Request):
 
 #   Авторизация --------------------------------------------------------------------------------------------
 
-@app.get("/login", response_class=HTMLResponse)                             #   Получить HTML страницу логин
+@app.get("/login", response_class=HTMLResponse, tags=["Login"], summary="get login page")             #   Получить HTML страницу логин
 async def get_login(request: Request):
     return templates.TemplateResponse(request=request, name="login.html")
 
-@app.post("/login")                                                         #   Создать POST запрос 
+@app.post("/login", tags=["Login"], summary="Login function")                                         #   Создать POST запрос 
 async def post_login(   request: Request,
                         db: SessionDep,
                         username: str = Form(...),
@@ -228,8 +229,6 @@ async def post_login(   request: Request,
         )
 
 
-    response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)     #   редирект на домашнюю страницу
-    response.set_cookie(key="username", value=username)                     #   с юзернеймом
     return response 
 
 
@@ -250,17 +249,19 @@ def get_pass_hash(passw):
 async def get_registr(request: Request):
     return templates.TemplateResponse(request=request, name="registr.html")
 
-@app.post("/registr", tags=["Registration"], summary="Add new User to database")
+@app.post("/registr", tags=["Registration"], summary="Add new User to database")            #   Пост запрос на регистрацию
 async def registr(new_user: RegistrSchema, 
                   db: SessionDep):
     
-    db_user = await db.query(User).filter(User.username == new_user.username).first()
-    if db_user:
-        raise HTTPException(status_code=401, detail="Username allready exist!")
+    db_user = await db.execute(select(User).where(User.username == new_user.username))
+    scalar_user = db_user.scalars().first()                                                 #   Переводим в скалярный вид
+    if scalar_user:
+        raise HTTPException(status_code=400, detail="Username allready exist!")
     
-    db_email = await db.query(User).filter(User.email == new_user.email).first()
-    if db_email:
-        raise HTTPException(status_code=401, detail="E-mail allready exist!")
+    db_email = await db.execute(select(User).where(User.email == new_user.email))
+    scalar_email = db_email.scalars().first()
+    if scalar_email:
+        raise HTTPException(status_code=400, detail="E-mail allready exist!")
     
     hpass = get_pass_hash(new_user.password)
 
@@ -268,24 +269,22 @@ async def registr(new_user: RegistrSchema,
                         email = new_user.email,
                         hash_pass = hpass              )
     db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    await db.commit()
+    await db.refresh(new_user)
 
-    response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)     #   редирект на домашнюю страницу
-    response.set_cookie(key="username", value=new_user.username)            #   с юзернеймом
-    return response
+    return new_user
 
 
 
 #   Личный Кабинет ------------------------------------------------------------------------------------------
 
-@app.get("/account", response_class=HTMLResponse)
+@app.get("/account", response_class=HTMLResponse, tags=["Personal Account"], summary="link to personal cabinet")
 async def get_account(request: Request):
     username = request.cookies.get("username")
     return templates.TemplateResponse("account.html",
       {"request":request, "username": username, "date":datetime.now()})
 
-@app.post("/logout")                                                        #   Создать POST запрос 
+@app.post("/logout", tags=["Personal Account"], summary="logout button function")                             #   Создать POST запрос 
 async def logout(request: Request):
     response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
     response.delete_cookie("username")
@@ -293,7 +292,7 @@ async def logout(request: Request):
 
 #   Функция для создания пустых таблиц БД -------------------------------------------------------------------
 
-@app.post("/create_db")                         
+@app.post("/create_db", tags=["Data Base"], summary="delete and create db file")                         
 async def create_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
