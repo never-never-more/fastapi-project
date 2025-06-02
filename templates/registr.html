@@ -3,23 +3,63 @@
 Registration
 {% endblock %}
 {% block content %}
-<form action="" method="post" class="form-window">
+<div class="form-window">
     <span class="message">Sign Up</span>
-    <div class="form-group">
+
+    <!-- Сообщение об ошибках -->
+    <div id="error-message" class="error-message" style="display: none;"></div>
+
+    <form id="register-form" class="form-group">
         <label for="username">Username:</label>
         <input type="username" class="form-control" id="username" name="username" required>
-    </div>
-    <div class="form-group">
+
         <label for="email">Email:</label>
         <input type="email" class="form-control" id="email" name="email" required>
-    </div>
 
-    <div class="form-group">
         <label for="password">Password:</label>
         <input type="password" class="form-control" id="password" name="password" required>
-    </div>
 
-    <button type="submit" class="btn-primary">Sign Up</button>
-    <a href="/login" class="btn-link">Sign In</a>
-</form>
+        <button type="submit" class="btn-primary">Sign Up</button>
+        <a href="/login" class="btn-link">Sign In</a>
+    </form>
+</div>
+
+<script>
+document.getElementById('register-form').addEventListener('submit', async function(e) {
+    e.preventDefault(); // Не отправлять форму стандартным способом
+
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    const errorMessage = document.getElementById('error-message');
+    errorMessage.style.display = 'none';
+    errorMessage.textContent = '';
+
+    try {
+        const response = await fetch('/registr', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, email, password })
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            errorMessage.textContent = data.detail || 'An error occurred';
+            errorMessage.style.display = 'block';
+            return;
+        }
+
+        const result = await response.json();
+        window.location.href = '/'; // Перенаправление после успешной регистрации
+    } catch (err) {
+        console.error(err);
+        errorMessage.textContent = 'Could not connect to server.';
+        errorMessage.style.display = 'block';
+    }
+});
+</script>
+
 {% endblock %}

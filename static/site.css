@@ -261,6 +261,7 @@ form input[type="email"] {
     border: 1px solid #ddd; /* Серая рамка */
     border-radius: 4px;   /* Закругление углов */
     font-size: 13px;      /* Размер шрифта */
+    margin-bottom: 12px;
 }
 
 .form-group textarea {

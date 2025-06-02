@@ -7,7 +7,7 @@ from datetime import datetime
 
 from sqlalchemy import select
 import uvicorn
-from schemas import RegistrSchema
+from schemas import LoginSchema, RegistrSchema
 from passlib.context import CryptContext
 from database import engine, Base, get_db
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -212,24 +212,14 @@ async def get_login(request: Request):
     return templates.TemplateResponse(request=request, name="login.html")
 
 @app.post("/login", tags=["Login"], summary="Login function")                                         #   Создать POST запрос 
-async def post_login(   request: Request,
-                        db: SessionDep,
-                        username: str = Form(...),
-                        password: str = Form(...)       ):
+async def post_login(   user: LoginSchema,
+                        db: SessionDep      ):
     
-    user = db.query(User).filter(User.username == username).first()
-    if not user or not verify_pass(password, user.hash_pass):
-        return templates.TemplateResponse(
-            "login.html",
-            {
-                "request": request,
-                "error": "Неверное имя пользователя или пароль",
-            },
-            status_code=401
-        )
+    db_user = await db.execute(select(User).where(User.username == user.username))
+    if not db_user or not verify_pass(user.password, db_user.hash_pass):
+        raise HTTPException(status_code=400, detail="Invalid username or password")
 
-
-    return response 
+    return {"message": "Login sucecssful", "username": db_user.username }
 
 
 
@@ -250,19 +240,19 @@ async def get_registr(request: Request):
     return templates.TemplateResponse(request=request, name="registr.html")
 
 @app.post("/registr", tags=["Registration"], summary="Add new User to database")            #   Пост запрос на регистрацию
-async def registr(new_user: RegistrSchema, 
-                  db: SessionDep):
+async def registr(  new_user: RegistrSchema, 
+                    db: SessionDep              ):
     
-    db_user = await db.execute(select(User).where(User.username == new_user.username))
+    db_user = await db.execute(select(User).where(  (User.username == new_user.username)
+                                                    | (User.email == new_user.email)         ))
+    
     scalar_user = db_user.scalars().first()                                                 #   Переводим в скалярный вид
     if scalar_user:
-        raise HTTPException(status_code=400, detail="Username allready exist!")
-    
-    db_email = await db.execute(select(User).where(User.email == new_user.email))
-    scalar_email = db_email.scalars().first()
-    if scalar_email:
-        raise HTTPException(status_code=400, detail="E-mail allready exist!")
-    
+        if scalar_user.username == new_user.username:
+            raise HTTPException(status_code=400, detail="Username allready exist!")
+        else:
+            raise HTTPException(status_code=400, detail="E-mail allready exist!")
+        
     hpass = get_pass_hash(new_user.password)
 
     new_user = User(    username = new_user.username,
@@ -284,7 +274,7 @@ async def get_account(request: Request):
     return templates.TemplateResponse("account.html",
       {"request":request, "username": username, "date":datetime.now()})
 
-@app.post("/logout", tags=["Personal Account"], summary="logout button function")                             #   Создать POST запрос 
+@app.post("/logout", tags=["Personal Account"], summary="logout button function")             #   Создать POST запрос 
 async def logout(request: Request):
     response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
     response.delete_cookie("username")
