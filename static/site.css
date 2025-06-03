@@ -86,6 +86,10 @@ hr { /* линия между навбаром и остальным боди */
 
 }
 
+span.message {
+    margin-bottom: 15px;
+}
+
 form p {
     margin-bottom: 12px; /* Отступ между блоками полей */
 }
@@ -261,7 +265,7 @@ form input[type="email"] {
     border: 1px solid #ddd; /* Серая рамка */
     border-radius: 4px;   /* Закругление углов */
     font-size: 13px;      /* Размер шрифта */
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .form-group textarea {

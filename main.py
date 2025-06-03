@@ -29,13 +29,13 @@ SessionDep = Annotated[AsyncSession, Depends(get_db)]                       #   
 
 #   Домашняя страница -----------------------------------------------------------------------------------------------------
 
-@app.get("/", response_class=HTMLResponse)                                  #   Request — это класс из модуля fastapi,
+@app.get("/", response_class=HTMLResponse, tags=["Home"], summary="get home page")  #   Request — это класс из модуля fastapi,
 async def get_home(     request: Request,
                         db: SessionDep,
                         show_form: bool = False             ):              #   который предоставляет доступ к:
     
     username = request.cookies.get("username")                              #   headers, cookies, form(), body() и т.д.
-    posts = db.query(Post).order_by(Post.date.desc()).limit(10).all()
+    posts = db.execute(select(Post).order_by(Post.date.desc()).limit(10).all())
 
     return templates.TemplateResponse("home.html",
       {     "request":request,
